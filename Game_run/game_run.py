@@ -339,5 +339,3 @@ class Game:
 game = Game(screen_size)
 game.run_game()
 
-game = Game(screen_size)
-game.run_game()
