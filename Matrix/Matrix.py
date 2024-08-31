@@ -1,68 +1,70 @@
 import pygame
-import pygame_gui
 import random
 
-# Создаем окно, даем название окна
+pygame.init()
+
 window_size = (800, 600)
 window = pygame.display.set_mode(window_size)
 pygame.display.set_caption('Матрица Lite')
-pygame.init()
-# Чтобы мы могли управлять обновление и обработку событий для всех GUI-элементов,
-# добавленных в него
-gui_manager = pygame_gui.UIManager(window_size)
 
-# Создаем цифры 1 и 0
-font = pygame.font.SysFont('Consolas', 20)
-text_color = pygame.Color('green')
-text_symbols = ['0', '1']
+font = pygame.font.SysFont('MS Gothic', 20)
+color = ['green', (30, 89, 69), (0, 69, 36), (0, 102, 51), 'green', 'green', ]
 
-# Рандомно выбираем позицию и скорость полета объектов
-text_pos = [(random.randint(0, window_size[0]), 0) for i in range(100)]
-text_speed = [random.uniform(3, 10) for i in range(100)]
-text_surface_list = []
+katakana_symbols = ['ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ',
+                    'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト',
+                    'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ',
+                    'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', 'ユ', 'ヨ', 'ラ', 'リ',
+                    'ル', 'レ', 'ロ', 'ワ', 'ヲ', 'ン']
 
-# Параметры для кнопки
-button_size = (100, 50)
-button_pos = (350, 250)
-button_text = 'Матрица!'
+hiragana_symbols = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ',
+                    'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と',
+                    'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ',
+                    'ま', 'み', 'む', 'め', 'も', 'や', 'ゆ', 'よ', 'ら', 'り',
+                    'る', 'れ', 'ろ', 'わ', 'を', 'ん']
 
-# Создаем саму кнопку
-button = pygame_gui.elements.UIButton(
-    relative_rect=pygame.Rect(button_pos, button_size),
-    text=button_text,
-    manager=gui_manager,
-    visible=True
-)
+japanese_symbols = katakana_symbols + hiragana_symbols
 
-while True:
-    '''Основной цикл'''
-    time_delta = pygame.time.Clock().tick(60)
-    # Ловим все события которые происходят на экране
+columns = 40
+column_width = window_size[0] // columns
+
+text_pos = [[(x * column_width, random.randint(-window_size[1], 0)) for y in range(20)] for x in range(columns)]
+text_speed = [random.randint(2, 5) for _ in range(columns)]
+change_frequency = [random.randint(5, 15) for _ in range(columns)]
+frame_counters = [[0 for _ in range(20)] for _ in range(columns)]
+text_color = [random.choice(color) for _ in range(columns)]
+
+text_surface_list = [[font.render(random.choice(japanese_symbols), True, random.choice(color)) for _ in range(20)] for _
+                     in range(columns)]
+
+clock = pygame.time.Clock()
+running = True
+
+while running:
+    time_delta = clock.tick(60) / 1000.0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        # Если наша кнопка нажата, то создаем 100 разных элементов матрицы (0 или 1), рандомно задаем их первоначальную позицию и скорость
-        if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            text_surface_list = []
-            button.visible = False
-            for i in range(100):
-                text_symbol = random.choice(text_symbols)
-                text_surface = font.render(text_symbol, True, text_color)
-                text_surface_list.append(text_surface)
-
-        gui_manager.process_events(event)
-
-    gui_manager.update(time_delta)
+            running = False
 
     window.fill(pygame.Color('black'))
-    # Изменяем позицию каждого элемента матрицы, изменяя ее позицию по y
-    for i in range(100):
-        text_pos[i] = (text_pos[i][0], text_pos[i][1] + text_speed[i])
-        if text_pos[i][1] > window_size[1]:
-            text_pos[i] = (random.randint(0, window_size[0]), -20)
-        if len(text_surface_list) > i:
-            window.blit(text_surface_list[i], text_pos[i])
 
-    gui_manager.draw_ui(window)
+    for col in range(columns):
+        for i in range(len(text_pos[col])):
+
+            x, y = text_pos[col][i]
+            y += text_speed[col]
+            if y > window_size[1]:
+                y = random.randint(-20, -5)
+
+            frame_counters[col][i] += 1
+            if frame_counters[col][i] >= change_frequency[col]:
+                text_symbol = random.choice(japanese_symbols)
+                text_surface_list[col][i] = font.render(text_symbol, True, text_color[col])
+                frame_counters[col][i] = 0
+
+            text_pos[col][i] = (x, y)
+            window.blit(text_surface_list[col][i], (x, y))
+
     pygame.display.update()
+
+pygame.quit()
