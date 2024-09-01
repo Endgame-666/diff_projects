@@ -5,7 +5,7 @@ pygame.init()
 
 window_size = (800, 600)
 window = pygame.display.set_mode(window_size)
-pygame.display.set_caption('Матрица Lite')
+pygame.display.set_caption('Матрица')
 
 font = pygame.font.SysFont('MS Gothic', 20)
 color = ['green', (30, 89, 69), (0, 69, 36), (0, 102, 51), 'green', 'green', ]
