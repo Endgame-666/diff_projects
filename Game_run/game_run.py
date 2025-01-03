@@ -11,7 +11,7 @@ gui_manager = pygame_gui.UIManager(screen_size)
 
 
 class Game:
-    best_records = list()  # Список с результами
+    best_records = list()
 
     def __init__(self, screen_size):
         pygame.init()
@@ -120,7 +120,7 @@ class Game:
 
     def end(self):
         """Делает экран конца игры и показывает результаты"""
-        self.game_over = True  # флаг окончания игры
+        self.game_over = True
         screen.fill('black')
         end_font = pygame.font.SysFont('Consolas', 50)
         end = end_font.render(
